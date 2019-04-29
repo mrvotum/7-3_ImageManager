@@ -38,7 +38,7 @@ export default class AddImages {
 
       xhr.addEventListener('load', () => {
         if (xhr.status === 200) {
-          URL.revokeObjectURL(`https://seven-three.herokuapp.com/${xhr.response}`);
+          URL.revokeObjectURL(`https://seven-three.herokuapp.com${xhr.response}`);
 
           this.idCount += 1;
 
