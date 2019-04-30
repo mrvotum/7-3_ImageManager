@@ -1,4 +1,6 @@
 /* eslint-disable no-loop-func */
+import API from './api';
+
 export default class AddImages {
   constructor() {
     this.fileEl = document.querySelector('[data-id=file]'); // input file
@@ -9,6 +11,8 @@ export default class AddImages {
   }
 
   create() {
+    this.loadTasks();
+
     this.addListeners();
     this.addDnDListenters();
     this.addCrossListenter();
@@ -29,9 +33,10 @@ export default class AddImages {
       previewEl.className = 'img';
       imgEl.innerHTML = '<div data-btn="delete" class="deleteBtn"></div>';
 
-      // wjjwjwjwjw
+
       const formData = new FormData(this.form);
       const xhr = new XMLHttpRequest();
+
 
       xhr.open('POST', 'https://seven-three.herokuapp.com');
       // TODO: subscribe to response
@@ -80,11 +85,50 @@ export default class AddImages {
 
   // событие на крестик для удаления
   addCrossListenter() {
+    const api = new API('https://seven-three.herokuapp.com/imagesArr');
+
+    async function a(idEl) {
+      // eslint-disable-next-line no-unused-vars
+      const images = await api.remove(idEl);
+    }
+
     this.imagesContainer.addEventListener('click', (event) => {
       if (event.toElement.className === 'deleteBtn') {
         const img = document.getElementById(event.toElement.parentElement.id);
+        console.log(img.id);
+        a(img.id);
         img.remove();
       }
     });
+  }
+
+
+  // eslint-disable-next-line class-methods-use-this
+  loadTasks() {
+    console.log('Загружаю с сервера данные...');
+    const api = new API('https://seven-three.herokuapp.com/imagesArr');
+
+    async function a(imagesContainer) {
+      const images = await api.load();
+      const data = await images.json();
+      // console.log(data);
+      for (let i = 0; i < data.length; i += 1) {
+        if (data[i].name !== '.gitkeep') {
+          const imgEl = document.createElement('div');
+          imgEl.className = 'imgHolder';
+          imgEl.id = data[i].name;
+
+          const previewEl = document.createElement('img');
+          previewEl.src = `https://seven-three.herokuapp.com/${data[i].name}`;
+          previewEl.className = 'img';
+          imgEl.innerHTML = '<div data-btn="delete" class="deleteBtn"></div>';
+
+          imagesContainer.appendChild(imgEl);
+          imgEl.appendChild(previewEl);
+        }
+      }
+    }
+
+    a(this.imagesContainer);
   }
 }
